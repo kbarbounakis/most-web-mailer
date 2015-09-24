@@ -297,7 +297,7 @@ MailerHelper.prototype.send = function(data, callback) {
                     callback(null, err);
                 }
                 else {
-                    er = new Error('Mail template cannot be found or refers to a template engine whic is not implemented by this application.');er.code = 'ETMPL';
+                    er = new Error('Mail template cannot be found or refers to a template engine which is not implemented by this application.');er.code = 'ETMPL';
                     callback(er)
                 }
             });
