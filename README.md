@@ -1,5 +1,4 @@
 # most-web-mailer
-Most Web Framework Mailer Module
 
 Most Web Framework Mailer simplifies mail operations inside in a most web application.
 
