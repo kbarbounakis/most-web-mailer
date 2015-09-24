@@ -1,6 +1,6 @@
 # most-web-mailer
 
-Most Web Framework Mailer simplifies mail operations inside in a most web application.
+Most Web Framework Mailer simplifies mail operations inside in a MOST web application.
 
 Install with npm
 
