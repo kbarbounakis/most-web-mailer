@@ -9,8 +9,8 @@ Install with npm
 Use most-web-mailer to send an html static email:
 
     var mm = require('most-web-mailer'), 
-    //the current MOST Web Framework HTTP context
     web = require('most-web');
+    //init mail in the current HTTP context
     mm.mailer(context).transporter({
         service:'gmail',
         auth:{
@@ -66,8 +66,8 @@ Create a file named html.ejs (Note: EJS is the default view engine for every MOS
 Finally send dynamic mail template:
 
     var mm = require('most-web-mailer'), 
-    //the current MOST Web Framework HTTP context
     web = require('most-web');
+    //init mail in the current HTTP context
     mm.mailer(context).from('user@example.com')
         .to('friend@example.com')
         .subject('Hello from user')
