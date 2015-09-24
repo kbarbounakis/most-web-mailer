@@ -218,20 +218,21 @@ MailerHelper.prototype.send = function(data, callback) {
                 self.options.bcc = bcc.split(';');
             }
         }
+
+        if (!util.isArray(self.options.to)) {
+            er = new Error('Invalid mail recipients. Expected array.'); er.code = 'EARG';
+            return callback(er);
+        }
+        if (self.options.to.length==0) {
+            er = new Error('Invalid mail recipients. Expected array.'); er.code = 'EARG';
+            return callback(new Error('Invalid mail recipients. Recipients list cannot be empty.'));
+        }
+
         //create mail object
         var mail = {
             from: self.options.from || from,
             to: self.options.to.join(';')
         };
-
-        if (!util.isArray(mail.to)) {
-            er = new Error('Invalid mail recipients. Expected array.'); er.code = 'EARG';
-            return callback(er);
-        }
-        if (mail.to.length==0) {
-            er = new Error('Invalid mail recipients. Expected array.'); er.code = 'EARG';
-            return callback(new Error('Invalid mail recipients. Recipients list cannot be empty.'));
-        }
         //copy properties (subject, cc, bcc)
         if (self.options.subject) { mail.subject = self.options.subject; }
         if (self.options.cc) { mail.cc = self.options.cc.join(';'); }
