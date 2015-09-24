@@ -24,7 +24,7 @@ Use most-web-mailer to send an html static email:
             done(err);
         });
     
-You can use default mail transporter as it is defined in application configuration section settings#mail section. In this case you can ommit transporter initialization. Here is the section as may be defined in application configuration:
+You can use default mail transporter as it is defined in application configuration section settings#mail. In this case you can ommit transporter initialization. Here is the section as may be defined in application configuration:
 
     ...
     "settings": {
@@ -42,7 +42,7 @@ You can use default mail transporter as it is defined in application configurati
     
 Note: MOST Web Framework Mailer uses [nodemailer](https://github.com/andris9/Nodemailer) as sender engine.
 
-MOST Web Framwork gives you also the opportunity to send dynamic mail templates by using the registered view engines. So, create a folder in app/templates/mails directory
+MOST Web Framework Mailer gives you also the opportunity to send dynamic mail templates by using the registered view engines. So, create a folder in app/templates/mails directory
 
     + app
       + templates
