@@ -1,0 +1,39 @@
+{
+  "name": "most-web-mailer",
+  "version": "0.1.0",
+  "description": "Most Web Framework Mailer Module",
+  "homepage": "http://www.themost.io/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kbarbounakis/most-web-mailer.git"
+  },
+  "keywords": [
+    "mail",
+    "mailer",
+    "templates",
+    "most",
+    "web"
+  ],
+  "author": {
+    "name": "Kyriakos Barbounakis",
+    "email": "k.barbounakis@gmail.com"
+  },
+  "licenses": [
+    {
+      "type": "BSD-3 Clause"
+    }
+  ],
+  "dependencies": {
+    "async": "^1.4.2",
+    "fast-csv": "^0.6.0",
+    "nodemailer": "^1.4.0"
+  },
+  "devDependencies": {},
+  "main": "index.js",
+  "scripts": {},
+  "_id": "most-web-mailer@0.1.0",
+  "_from": "most-web-mailer@",
+  "bugs": {
+    "url": "https://github.com/kbarbounakis/most-web-mailer/issues"
+  }
+}
