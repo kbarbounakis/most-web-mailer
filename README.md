@@ -24,7 +24,7 @@ Use most-web-mailer to send an html static email:
             done(err);
         });
     
-You can use default mail transporter as it is defined in application configuration section settings#mail. In this case you can ommit transporter initialization. Here is the section as may be defined in application configuration:
+You can use default mail transporter as it is defined in application configuration section settings#mail. In this case you can omit transporter initialization. Here is the section as may be defined in application configuration:
 
     ...
     "settings": {
