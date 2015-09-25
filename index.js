@@ -21,7 +21,8 @@ var util = require('util'),
  */
 function MailerHelper(context) {
     this.context = context;
-    this.options = { test: false, to:[] };
+    this._test = false;
+    this.options = { };
 }
 
 /**
@@ -30,8 +31,8 @@ function MailerHelper(context) {
 MailerHelper.prototype.template = function(template) {
     if (typeof template === 'string') {
         delete this.options.text;
-        delete this.options.body;
-        this.options.template = template;
+        delete this.options.html;
+        this.template = template;
     }
     else {
         var er = new Error('Invalid argument. Expected string.'); er.code = 'EARG';
@@ -46,8 +47,8 @@ MailerHelper.prototype.template = function(template) {
 MailerHelper.prototype.body = function(body) {
     if (typeof body === 'string') {
         delete this.options.text;
-        delete this.options.template;
-        this.options.body = body;
+        delete this.template;
+        this.options.html = body;
     }
     else {
         var er = new Error('Invalid argument. Expected string.'); er.code = 'EARG';
@@ -62,8 +63,8 @@ MailerHelper.prototype.body = function(body) {
  */
 MailerHelper.prototype.text = function(text) {
     if (typeof text === 'string') {
-        delete this.options.body;
-        delete this.options.template;
+        delete this.options.html;
+        delete this.template;
         this.options.text = text;
     }
     else {
@@ -101,6 +102,59 @@ MailerHelper.prototype.from = function(sender) {
     }
     return this;
 };
+
+/**
+ * @param {string|Array} reply
+ */
+MailerHelper.prototype.replyTo = function(reply) {
+    if (util.isArray(reply)) {
+        this.options.reply = reply.join(';');
+    }
+    else if (typeof reply === 'string') {
+        this.options.reply = reply;
+    }
+    else {
+        var er = new Error('Invalid argument. Expected string or array.'); er.code = 'EARG';
+        throw(er);
+    }
+    return this;
+};
+
+/**
+ * @param {string|Array} p
+ */
+MailerHelper.prototype.attachments = function(p) {
+    var self = this;
+
+    var arr = [];
+    if (util.isArray(p)) {
+        arr = p.slice(0)
+    }
+    else if (arguments.length>1) {
+        arr.push.apply(arr, arguments);
+    }
+    else if (typeof p === 'string') {
+        arr.push(p);
+    }
+    else {
+        var er = new Error('Invalid argument. Expected string or array.'); er.code = 'EARG';
+        throw(er);
+    }
+    self.options.attachments = [];
+    arr.forEach(function(x) {
+        if (typeof x !== 'string') {
+            var er = new Error('Invalid argument. Expected string.'); er.code = 'EARG';
+            throw(er);
+        }
+        //add file attachment as string
+        self.options.attachments.push({
+                filename: path.basename(x),
+                content: fs.createReadStream(x)
+            });
+    });
+    return this;
+};
+
 /**
  * Applies mail primary recipients.
  * @param {string|Array} recipient
@@ -108,11 +162,10 @@ MailerHelper.prototype.from = function(sender) {
  */
 MailerHelper.prototype.to = function(recipient) {
     if (util.isArray(recipient)) {
-        this.options.to = recipient;
+        this.options.to = recipient.join(';');
     }
     else if (typeof recipient === 'string') {
-        this.options.to = [];
-        this.options.to.push(recipient);
+        this.options.to = recipient;
     }
     else {
         var er = new Error('Invalid argument. Expected string or array of strings.'); er.code = 'EARG';
@@ -127,7 +180,7 @@ MailerHelper.prototype.to = function(recipient) {
  * @returns {MailerHelper}
  */
 MailerHelper.prototype.transporter = function(opts) {
-    this.options.transporter = opts;
+    this._transporter = opts;
     return this;
 };
 
@@ -137,7 +190,7 @@ MailerHelper.prototype.transporter = function(opts) {
  * @returns {MailerHelper}
  */
 MailerHelper.prototype.test = function(value) {
-    this.options.test = !!value;
+    this._test = !!value;
     return this;
 };
 
@@ -148,11 +201,10 @@ MailerHelper.prototype.test = function(value) {
  */
 MailerHelper.prototype.cc = function(cc) {
     if (util.isArray(cc)) {
-        this.options.cc = cc;
+        this.options.cc = cc.join(';');
     }
     else if (typeof cc === 'string') {
-        this.options.cc = [];
-        this.options.cc.push(cc);
+        this.options.cc = cc;
     }
     else {
         var er = new Error('Invalid argument. Expected string or array of strings.'); er.code = 'EARG';
@@ -167,11 +219,10 @@ MailerHelper.prototype.cc = function(cc) {
  */
 MailerHelper.prototype.bcc = function(bcc) {
     if (util.isArray(bcc)) {
-        this.options.bcc = bcc;
+        this.options.bcc = bcc.join(';');
     }
     else if (typeof bcc === 'string') {
-        this.options.bcc = [];
-        this.options.bcc.push(cc);
+        this.options.bcc = bcc;
     }
     else {
         var er = new Error('Invalid argument. Expected string.'); er.code = 'EARG';
@@ -188,8 +239,8 @@ MailerHelper.prototype.send = function(data, callback) {
     callback = callback || function() {};
     var transporter, er, self = this, context = self.context;
     try {
-        if (!self.options.test) {
-            if (typeof this.options.transporter === 'undefined' || this.options.transporter==null) {
+        if (!self._test) {
+            if (typeof self._transporter === 'undefined' || self._transporter==null) {
                 //get default transporter
                 transporter = getDefaultTransporter(context);
                 if (typeof transporter === 'undefined' || transporter==null) {
@@ -198,29 +249,16 @@ MailerHelper.prototype.send = function(data, callback) {
                 }
             }
             else {
-                transporter = nodemailer.createTransport(self.options.transporter);
+                transporter = nodemailer.createTransport(self._transporter);
             }
         }
-        //get default sender (from application settings)
-        var from = getDefaultSender(context),
-            //get default bcc recipients (from application settings)
-            bcc = getDefaultBCC(context);
-        //if default bcc recipients are defined
-        if (typeof self.options.bcc === 'undefined' && typeof bcc !== 'undefined') {
-            //check if it's an array
-            if (util.isArray('bcc')) {
-                //and push items in mail bcc property
-                self.options.bcc = bcc.slice(0);
-            }
-            //else if bcc is a string
-            else if (typeof bcc === 'string') {
-                //split and push default bcc recipients
-                self.options.bcc = bcc.split(';');
-            }
-        }
+        //try to get default sender
+        tryDefaultBCC.call(self);
+        //try to get default bcc recipients
+        tryDefaultSender.call(self);
 
-        if (!util.isArray(self.options.to)) {
-            er = new Error('Invalid mail recipients. Expected array.'); er.code = 'EARG';
+        if (typeof self.options.to === 'undefined' || self.options.to == null) {
+            er = new Error('Invalid mail recipients. Recipients list cannot be empty.'); er.code = 'EARG';
             return callback(er);
         }
         if (self.options.to.length==0) {
@@ -229,39 +267,21 @@ MailerHelper.prototype.send = function(data, callback) {
         }
 
         //create mail object
-        var mail = {
-            from: self.options.from || from,
-            to: self.options.to.join(';')
-        };
-        //copy properties (subject, cc, bcc)
-        if (self.options.subject) { mail.subject = self.options.subject; }
-        if (self.options.cc) { mail.cc = self.options.cc.join(';'); }
-        if (self.options.bcc) { mail.bcc = self.options.bcc.join(';'); }
+        var mail = self.options;
+        if (typeof self.options.html === 'string' || typeof self.options.text === 'string') {
+            //finally send email
+            if (self._test) { return callback(null, mail); }
+            transporter.sendMail(mail, function (err, info) {
+                if (err) { callback(err); }
+                callback(null, info.response)
+            });
+        }
         //initialize view engine
-        if (typeof self.options.body === 'string') {
-            mail.html = self.options.body;
-            //finally send email
-            if (self.options.test) { return callback(null, mail); }
-            transporter.sendMail(mail, function (err, info) {
-                if (err) { callback(err); }
-                callback(null, info.response)
-            });
-        }
-        else if (typeof self.options.text === 'string') {
-            mail.text = self.options.text;
-            if (self.options.test) { return callback(null, mail); }
-            //finally send email
-            transporter.sendMail(mail, function (err, info) {
-                if (err) { callback(err); }
-                callback(null, info.response)
-            });
-
-        }
-        else if (typeof self.options.template === 'string') {
+        else if (typeof self.template === 'string') {
             var engines = context.application.config.engines;
             async.eachSeries(engines,function(item, cb) {
                 try {
-                    var templatePath = context.application.mapPath(util.format('/templates/mails/%s/html.%s' , self.options.template, item.extension));
+                    var templatePath = context.application.mapPath(util.format('/templates/mails/%s/html.%s' , self.template, item.extension));
                     fs.stat(templatePath, function(err, result) {
                         if (err) {
                             //file does not exist, so exit without error
@@ -275,7 +295,7 @@ MailerHelper.prototype.send = function(data, callback) {
                             engineInstance.render(templatePath, data, function(err, result) {
                                 if (err) { return cb(err); }
                                 mail.html = result;
-                                if (self.options.test) { return cb(mail); }
+                                if (self._test) { return cb(mail); }
                                 transporter.sendMail(mail, function (err, info) {
                                     if (err) { return cb(err); }
                                     cb(info.response)
@@ -332,44 +352,58 @@ function getDefaultTransporter(context) {
     return nodemailer.createTransport(options);
 }
 
-function getDefaultSender(context) {
-    if (typeof context === 'undefined')
+function tryDefaultSender() {
+    var self = this;
+    if (typeof self.options.from === 'string' && self.options.from.length>0) {
+        return;
+    }
+    if (typeof self.context === 'undefined')
         return;
     /**
      * @type {HttpApplication}
      */
-    var application = context.application;
+    var application = self.context.application;
     if (typeof application === 'undefined')
         return;
     if (typeof application.config.settings === 'undefined')
         return;
     /**
-     * @type {{service:string}|*}
+     * @type {{service:string,from:string}|*}
      */
-    var options = application.config.settings['mail'] || application.config.settings['mailSettings'];
-    if (typeof options === 'undefined' || options == 'null')
+    var opts = application.config.settings['mail'] || application.config.settings['mailSettings'];
+    if (typeof opts === 'undefined' || opts == 'null')
         return;
-    return options.from;
+    if (util.isArray(opts.from))
+        self.options.from = opts.from.join(';');
+    else if (typeof opts.from === 'string')
+        self.options.from = opts.from;
 }
 
-function getDefaultBCC(context) {
-    if (typeof context === 'undefined')
+function tryDefaultBCC() {
+    var self = this;
+    if (typeof self.options.bcc === 'string' && self.options.bcc.length>0) {
+        return;
+    }
+    if (typeof self.context === 'undefined')
         return;
     /**
      * @type {HttpApplication}
      */
-    var application = context.application;
+    var application = self.context.application;
     if (typeof application === 'undefined')
         return;
     if (typeof application.config.settings === 'undefined')
         return;
     /**
-     * @type {{service:string}|*}
+     * @type {{service:string,bcc:string}|*}
      */
-    var options = application.config.settings['mail'] || application.config.settings['mailSettings'];
-    if (typeof options === 'undefined' || options == 'null')
+    var opts = application.config.settings['mail'] || application.config.settings['mailSettings'];
+    if (typeof opts === 'undefined' || opts == 'null')
         return;
-    return options.bcc;
+    if (util.isArray(opts.bcc))
+        self.options.bcc = opts.bcc.join(';');
+    else if (typeof opts.bcc === 'string')
+        self.options.bcc = opts.bcc;
 }
 
 if (typeof exports !== 'undefined') {
