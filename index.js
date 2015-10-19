@@ -16,7 +16,7 @@ var util = require('util'),
 
 /**
  * @class MailerHelper
- * @params {HttpContext} context
+ * @params {HttpContext|*} context
  * @constructor
  */
 function MailerHelper(context) {
@@ -27,6 +27,7 @@ function MailerHelper(context) {
 
 /**
  * @param {string} template
+ * @returns {MailerHelper}
  */
 MailerHelper.prototype.template = function(template) {
     if (typeof template === 'string') {
@@ -43,6 +44,7 @@ MailerHelper.prototype.template = function(template) {
 
 /**
  * @param {string} body
+ * @returns {MailerHelper}
  */
 MailerHelper.prototype.body = function(body) {
     if (typeof body === 'string') {
@@ -60,6 +62,7 @@ MailerHelper.prototype.body = function(body) {
 /**
  * Applies plain text to mail template
  * @param {string} text
+ * @returns {MailerHelper}
  */
 MailerHelper.prototype.text = function(text) {
     if (typeof text === 'string') {
@@ -77,6 +80,7 @@ MailerHelper.prototype.text = function(text) {
 /**
  * Sets mail subject
  * @param {string} subject
+ * @returns {MailerHelper}
  */
 MailerHelper.prototype.subject = function(subject) {
     if (typeof subject === 'string') {
@@ -105,6 +109,7 @@ MailerHelper.prototype.from = function(sender) {
 
 /**
  * @param {string|Array} reply
+ * @returns {MailerHelper}
  */
 MailerHelper.prototype.replyTo = function(reply) {
     if (util.isArray(reply)) {
@@ -122,6 +127,7 @@ MailerHelper.prototype.replyTo = function(reply) {
 
 /**
  * @param {string|Array} p
+ * @returns {MailerHelper}
  */
 MailerHelper.prototype.attachments = function(p) {
     var self = this;
@@ -410,7 +416,7 @@ if (typeof exports !== 'undefined') {
     module.exports = {
         /**
          *
-         * @param {HttpContext} context
+         * @param {HttpContext|*} context
          * @returns {MailerHelper}
          */
         mailer: function(context) {
