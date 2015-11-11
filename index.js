@@ -14,6 +14,46 @@ var util = require('util'),
     async = require('async'),
     fs = require('fs');
 
+if (typeof Array.prototype.distinct === 'undefined')
+{
+    /**
+     * @param {Function} callback
+     * @param {Object=} [thisObject]
+     * @returns {*}
+     */
+    var distinct = function(callback, thisObject) {
+        if (this == null) {
+            throw new TypeError('Array.prototype.find called on null or undefined');
+        }
+        if (typeof callback !== 'function') {
+            throw new TypeError('callback must be a function');
+        }
+        var list = Object(this);
+        var length = list.length >>> 0;
+        var thisObj = arguments[1];
+        var value;
+        var res = [];
+        for (var i = 0; i < length; i++) {
+            if (i in list) {
+                value = list[i];
+                var item = callback.call(thisObj, value, i, list);
+                if (item)
+                    if (res.indexOf(item)<0)
+                        res.push(item);
+            }
+        }
+        return res;
+    };
+    if (Object.defineProperty) {
+        try {
+            Object.defineProperty(Array.prototype, 'distinct', {
+                value: distinct, configurable: true, enumerable: false, writable: true
+            });
+        } catch(e) {}
+    }
+    if (!Array.prototype.distinct) { Array.prototype.distinct = distinct; }
+}
+
 /**
  * @class MailerHelper
  * @params {HttpContext|*} context
@@ -113,7 +153,7 @@ MailerHelper.prototype.from = function(sender) {
  */
 MailerHelper.prototype.replyTo = function(reply) {
     if (util.isArray(reply)) {
-        this.options.reply = reply.join(';');
+        this.options.reply = reply.distinct(function(x) { return x; }).join(';');
     }
     else if (typeof reply === 'string') {
         this.options.reply = reply;
@@ -168,7 +208,7 @@ MailerHelper.prototype.attachments = function(p) {
  */
 MailerHelper.prototype.to = function(recipient) {
     if (util.isArray(recipient)) {
-        this.options.to = recipient.join(';');
+        this.options.to = recipient.distinct(function(x) { return x; }).join(';');
     }
     else if (typeof recipient === 'string') {
         this.options.to = recipient;
@@ -207,7 +247,7 @@ MailerHelper.prototype.test = function(value) {
  */
 MailerHelper.prototype.cc = function(cc) {
     if (util.isArray(cc)) {
-        this.options.cc = cc.join(';');
+        this.options.cc = cc.distinct(function(x) { return x; }).join(';');
     }
     else if (typeof cc === 'string') {
         this.options.cc = cc;
@@ -225,7 +265,7 @@ MailerHelper.prototype.cc = function(cc) {
  */
 MailerHelper.prototype.bcc = function(bcc) {
     if (util.isArray(bcc)) {
-        this.options.bcc = bcc.join(';');
+        this.options.bcc = bcc.distinct(function(x) { return x; }).join(';');
     }
     else if (typeof bcc === 'string') {
         this.options.bcc = bcc;
