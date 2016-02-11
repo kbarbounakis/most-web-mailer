@@ -8,6 +8,9 @@
  * Released under the BSD3-Clause license
  * Date: 2015-09-24
  */
+/**
+ * @ignore
+ */
 var util = require('util'),
     path = require('path'),
     nodemailer = require('nodemailer'),
@@ -20,6 +23,7 @@ if (typeof Array.prototype.distinct === 'undefined')
      * @param {Function} callback
      * @param {Object=} [thisObject]
      * @returns {*}
+     * @ignore
      */
     var distinct = function(callback, thisObject) {
         if (this == null) {
@@ -53,9 +57,33 @@ if (typeof Array.prototype.distinct === 'undefined')
     }
     if (!Array.prototype.distinct) { Array.prototype.distinct = distinct; }
 }
+/**
+ * @param {...string|string[]} p
+ * @ignore
+ * @private
+ */
+function argumentsArray(p) {
+    var arr = [], args = [];
+    args.push.apply(args, arguments);
+    args.forEach(function(x) {
+        //backward compatibility test
+        if (util.isArray(x)) {
+            arr.push.apply(arr, x);
+        }
+        else if (typeof x === 'string') {
+            arr.push(x);
+        }
+        else if (typeof x !== 'undefined' && x != null) {
+            var er = new Error('Invalid argument. Expected string or array or param array of string.'); er.code = 'EARG';
+            throw(er);
+        }
+    });
+    return arr.distinct(function(x) { return x; });
+}
 
 /**
- * @class MailerHelper
+ * MailHelper class contains a set of helper methods for sending emails.
+ * @class
  * @params {HttpContext|*} context
  * @constructor
  */
@@ -66,7 +94,42 @@ function MailerHelper(context) {
 }
 
 /**
- * @param {string} template
+ * Sets the mail template which are going to be used for this mail message.
+ * The name of the template is a folder lies on application's mail templates folder (/app/templates/mails/).
+ * <br>
+ * MOST Web Mailer uses this naming convention in order to define and use different mail templates.
+ * The mail templates folder may have the following structure:
+ * <pre>
+ *     app
+ *        + templates
+ *          + mails
+ *             + order-reply
+ *                  + html.ejs
+ *             + registration-reply
+ *                  + html.ejs
+ *                  + log.jpeg
+ * </pre>
+ * Each mail template has an html.* file which represents the message body to be rendered using the view engine associated with the extension of its template.
+ * The most common view engine for this operation is the EJS view engine which is an embedded view engine of all MOST Web Framework applications.
+ * It may also has other files (images, icons etc) which are defined in message body.
+ * <pre>
+ *     &lt;html&gt;
+ *         &lt;head&gt;
+ *             &lt;title&gt;Order Reply&lt;/title&gt;
+ *         &lt;/head&gt;
+ *         &lt;body&gt;
+ *             &lt;p&gt;Hello &lt;%=locals.data.customer.description&gt;&lt;/p&gt;
+ *             &lt;p&gt;
+ *                 Thank you for your order no. &lt;%=locals.data.orderNumber%&gt; dated &lt;%=locals.data.orderDate%&gt;.
+ *             &lt;/p&gt;
+ *             &lt;p&gt;
+ *                 Yours faithfully,
+ *                 Sales Department
+ *             &lt;/p&gt;
+ *         &lt;/body&gt;
+ *     &lt;/html&gt;
+ * </pre>
+ * @param {string} template - A string that represents the name of the template.
  * @returns {MailerHelper}
  */
 MailerHelper.prototype.template = function(template) {
@@ -83,8 +146,19 @@ MailerHelper.prototype.template = function(template) {
 };
 
 /**
- * @param {string} body
+ * Sets the mail body of an HTML message.
+ * @param {string} body - A string that represents the HTML body of the message to be sent.
  * @returns {MailerHelper}
+ *
+ * @example
+ *
+ var mm = require("most-web-mailer");
+ mm.mailer(context).subject("Good morning")
+ .body("<p style='color:lightblue'>This is an HTML message</p>")
+ .to("user@example.com")
+ .send(function(err, res) {
+    return done(err);
+});
  */
 MailerHelper.prototype.body = function(body) {
     if (typeof body === 'string') {
@@ -100,9 +174,19 @@ MailerHelper.prototype.body = function(body) {
 };
 
 /**
- * Applies plain text to mail template
- * @param {string} text
+ * Sets the mail body of a plain text message.
+ * @param {string} text - A string that represents the body of the message to be sent.
  * @returns {MailerHelper}
+ *
+ * @example
+ *
+ var mm = require("most-web-mailer");
+ mm.mailer(context).subject("Good morning")
+ .text("This is a plain text message.")
+ .to("user@example.com")
+ .send(function(err, res) {
+    return done(err);
+});
  */
 MailerHelper.prototype.text = function(text) {
     if (typeof text === 'string') {
@@ -118,8 +202,8 @@ MailerHelper.prototype.text = function(text) {
 };
 
 /**
- * Sets mail subject
- * @param {string} subject
+ * Sets the mail subject.
+ * @param {string} subject - A string that represents the subject of the message to be sent.
  * @returns {MailerHelper}
  */
 MailerHelper.prototype.subject = function(subject) {
@@ -134,7 +218,8 @@ MailerHelper.prototype.subject = function(subject) {
 };
 
 /**
- * @param {string} sender
+ * Sets the mail sender.
+ * @param {string} sender - A string that represents the email address of the sender.
  */
 MailerHelper.prototype.from = function(sender) {
     if (typeof sender === 'string') {
@@ -148,14 +233,12 @@ MailerHelper.prototype.from = function(sender) {
 };
 
 /**
- * @param {string|Array} reply
+ * Sets the email address that will be used as reply-to parameter of the mail message
+ * @param {string} reply - A string that represents an email address
  * @returns {MailerHelper}
  */
 MailerHelper.prototype.replyTo = function(reply) {
-    if (util.isArray(reply)) {
-        this.options.reply = reply.distinct(function(x) { return x; }).join(';');
-    }
-    else if (typeof reply === 'string') {
+    if (typeof reply === 'string') {
         this.options.reply = reply;
     }
     else {
@@ -166,26 +249,22 @@ MailerHelper.prototype.replyTo = function(reply) {
 };
 
 /**
- * @param {string|Array} p
+ * Sets the file path(s) which are going to be attached to the message.
+ * @param {...string} p - A string that represents the full path of the file(s) to be attached.
  * @returns {MailerHelper}
+ *
+ * @example
+var mm = require("most-web-mailer");
+mm.mailer(context).attachments("/tmp/cv.doc","/tmp/photo.jpeg")
+ .subject("New CV")
+ .body("I am sending you my new CV. Best Regards.")
+ .send(function(err, res) {
+    return done(err);
+});
  */
 MailerHelper.prototype.attachments = function(p) {
     var self = this;
-
-    var arr = [];
-    if (util.isArray(p)) {
-        arr = p.slice(0)
-    }
-    else if (arguments.length>1) {
-        arr.push.apply(arr, arguments);
-    }
-    else if (typeof p === 'string') {
-        arr.push(p);
-    }
-    else {
-        var er = new Error('Invalid argument. Expected string or array.'); er.code = 'EARG';
-        throw(er);
-    }
+    var arr = argumentsArray.apply(this, arguments);
     self.options.attachments = [];
     arr.forEach(function(x) {
         if (typeof x !== 'string') {
@@ -202,26 +281,51 @@ MailerHelper.prototype.attachments = function(p) {
 };
 
 /**
- * Applies mail primary recipients.
- * @param {string|Array} recipient
+ * Sets the message recipient(s).
+ * @param {...string} recipient - A string that represents the email address of a message recipient.
  * @returns {MailerHelper}
+ *
+ * @example
+ *
+ var mm = require("most-web-mailer");
+ mm.mailer(context).subject("Good morning")
+ .text("Have a nice day!")
+ .to("user@example.com", "other@example.com")
+ .send(function(err, res) {
+    return done(err);
+});
  */
 MailerHelper.prototype.to = function(recipient) {
-    if (util.isArray(recipient)) {
-        this.options.to = recipient.distinct(function(x) { return x; }).join(';');
-    }
-    else if (typeof recipient === 'string') {
-        this.options.to = recipient;
-    }
-    else {
-        var er = new Error('Invalid argument. Expected string or array of strings.'); er.code = 'EARG';
-        throw(er);
-    }
+    var p1 = argumentsArray.apply(this, arguments).join(';');
+    if (p1.length>0)
+        this.options.to = p1;
+    else
+        delete this.options.to;
     return this;
 };
 
 /**
- * Applies mail secondary recipients.
+ * Sets message transporter options.
+ * The default message transporter is defined in application config#settings.mail.
+ *<br>
+ * e.g. {
+          "port":587,
+          "host":"smtp.example.com",
+          "auth": {
+            "user":"sender@example.com",
+            "pass":"password"
+          }
+        }
+ <br>
+ or {
+    service: 'Gmail',
+    auth: {
+        user: 'gmail.user@gmail.com',
+        pass: 'userpass'
+    }
+} etc.
+ <br>
+ * For further information about message transporters visit {@link https://github.com/andris9/Nodemailer|Nodemailer}
  * @param {{service:string,host:string,port:string,auth:{user:string,pass:string,xoauth2:string},secure:boolean,ignoreTLS:boolean}|*} opts
  * @returns {MailerHelper}
  */
@@ -231,9 +335,24 @@ MailerHelper.prototype.transporter = function(opts) {
 };
 
 /**
- * Applies mail test operation.
- * @param {boolean} value
+ * Sets test message parameter.
+ * If value is true the mail message will not be sent and MailHelper.send() callback function will return the message body.
+ * This operation may be used for developing purposes against a message template.
+ * @param {boolean} value - If value is set to true, a test message operation will be started
  * @returns {MailerHelper}
+ *
+ * @example
+ var mm = require("most-web-mailer");
+ mm.mailer(context).subject("Good morning")
+ .subject("New Order")
+ .template("new-order-notification")
+ .to("employee1@example.com")
+ .test()
+ .send({ "id":1200, "product","17-inch LCD Monitor","customer":"Alexis Williams" }, function(err, res) {
+    if (err) { return done(err); }
+    console.log("Message Body: " + body;
+    return done();
+});
  */
 MailerHelper.prototype.test = function(value) {
     this._test = !!value;
@@ -241,45 +360,71 @@ MailerHelper.prototype.test = function(value) {
 };
 
 /**
- * Applies mail secondary recipients.
- * @param {string|Array} cc
+ * Sets the message secondary recipient(s).
+ * @param {string} cc - A string that represents the email address of a message recipient.
  * @returns {MailerHelper}
+ *
+ * @example
+ var mm = require("most-web-mailer");
+ mm.mailer(context).subject("Good morning")
+ .subject("New Order")
+ .template("new-order-notification")
+ .to("employee1@example.com")
+ .cc("sales1@example.com", "sales2@example.com")
+ .send({ "id":1200, "product","17-inch LCD Monitor","customer":"Alexis Williams" }, function(err, res) {
+    return done(err);
+});
  */
 MailerHelper.prototype.cc = function(cc) {
-    if (util.isArray(cc)) {
-        this.options.cc = cc.distinct(function(x) { return x; }).join(';');
-    }
-    else if (typeof cc === 'string') {
-        this.options.cc = cc;
-    }
-    else {
-        var er = new Error('Invalid argument. Expected string or array of strings.'); er.code = 'EARG';
-        throw(er);
-    }
+    var p1 = argumentsArray.apply(this, arguments).join(';');
+    if (p1.length>0)
+        this.options.cc = p1;
+    else
+        delete this.options.cc;
     return this;
 };
+
 /**
- * Applies mail other recipients.
- * @param {string|Array} bcc
+ * Sets the message BCC recipient(s).
+ * @param {...string} bcc - A string that represents the email address of a message BCC recipient.
  * @returns {MailerHelper}
+ *
+ * @example
+ *
+ var mm = require("most-web-mailer");
+ mm.mailer(context).subject("Good morning")
+ .text("This is a plain text message.")
+ .to("user@example.com")
+ .bcc("admin1@example.com","admin2@example.com")
+ .send(function(err, res) {
+    return done(err);
+});
  */
 MailerHelper.prototype.bcc = function(bcc) {
-    if (util.isArray(bcc)) {
-        this.options.bcc = bcc.distinct(function(x) { return x; }).join(';');
-    }
-    else if (typeof bcc === 'string') {
-        this.options.bcc = bcc;
-    }
-    else {
-        var er = new Error('Invalid argument. Expected string.'); er.code = 'EARG';
-        throw(er);
-    }
+    var p1 = argumentsArray.apply(this, arguments).join(';');
+    if (p1.length>0)
+        this.options.bcc = p1;
+    else
+        delete this.options.bcc;
     return this;
 };
 /**
- * Sends the mail.
- * @param {*} data
- * @param {function(Error=,*=)} callback
+ * Sends the mail message. If test parameter is true then the callback function returns the mail to be sent.
+ * @param {*} data - An object that represents the data to be passed in the mail template.
+ * @param {function(Error=,*=)} callback - A callback function where the first argument will contain an error, if an error occured while sending mail.
+ * The second argument will contain an object which represents the mail server response or the message body of test message
+ * (message parameter test was set to true).
+ *
+ * @example
+ *
+ var mm = require("most-web-mailer");
+ mm.mailer(context).subject("Good morning")
+ .text("This is a plain text message.")
+ .to("user2@example.com")
+ .cc("friend1@example.com","friend2@example.com")
+ .send(function(err, res) {
+    return done(err);
+});
  */
 MailerHelper.prototype.send = function(data, callback) {
     callback = callback || function() {};
@@ -377,6 +522,7 @@ MailerHelper.prototype.send = function(data, callback) {
 /**
  * Get MOST Web application default mail transporter as is is defined in settings#mail section
  * @param {HttpContext} context
+ * @ignore
  */
 function getDefaultTransporter(context) {
     if (typeof context === 'undefined')
@@ -451,13 +597,26 @@ function tryDefaultBCC() {
     else if (typeof opts.bcc === 'string')
         self.options.bcc = opts.bcc;
 }
-
 if (typeof exports !== 'undefined') {
+    /**
+     * @module most-web-mailer
+     * @type {{mailer: Function}}
+     */
     module.exports = {
         /**
-         *
-         * @param {HttpContext|*} context
+         * Creates a new instance of MailHelper class.
+         * @param {HttpContext|*} context - An instance of HttpContext class which represents the current HTTP context.
          * @returns {MailerHelper}
+         *
+         * @example
+         *
+var mm = require("most-web-mailer");
+mm.mailer(context)
+    .to("user@example.com")
+    .subject("Hello Message")
+    .body("Hello User.").send(function(err, res) {
+        return done(err);
+    });
          */
         mailer: function(context) {
             return new MailerHelper(context);
