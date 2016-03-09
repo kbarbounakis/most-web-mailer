@@ -448,14 +448,14 @@ MailerHelper.prototype.send = function(data, callback) {
         //try to get default bcc recipients
         tryDefaultSender.call(self);
 
-        if (typeof self.options.to === 'undefined' || self.options.to == null) {
-            er = new Error('Invalid mail recipients. Recipients list cannot be empty.'); er.code = 'EARG';
-            return callback(er);
-        }
-        if (self.options.to.length==0) {
-            er = new Error('Invalid mail recipients. Expected array.'); er.code = 'EARG';
-            return callback(new Error('Invalid mail recipients. Recipients list cannot be empty.'));
-        }
+        //if (typeof self.options.to === 'undefined' || self.options.to == null) {
+        //    er = new Error('Invalid mail recipients. Recipients list cannot be empty.'); er.code = 'EARG';
+        //    return callback(er);
+        //}
+        //if (self.options.to.length==0) {
+        //    er = new Error('Invalid mail recipients. Expected array.'); er.code = 'EARG';
+        //    return callback(new Error('Invalid mail recipients. Recipients list cannot be empty.'));
+        //}
 
         //create mail object
         var mail = self.options;
@@ -600,11 +600,11 @@ function tryDefaultBCC() {
 if (typeof exports !== 'undefined') {
     /**
      * @module most-web-mailer
-     * @type {{mailer: Function}}
      */
     module.exports = {
         /**
          * Creates a new instance of MailHelper class.
+         * @deprecated Use mailer.getMailer() instead
          * @param {HttpContext|*} context - An instance of HttpContext class which represents the current HTTP context.
          * @returns {MailerHelper}
          *
@@ -619,6 +619,24 @@ mm.mailer(context)
     });
          */
         mailer: function(context) {
+            return new MailerHelper(context);
+        },
+        /**
+         * Creates a new instance of MailHelper class.
+         * @param {HttpContext|*} context - An instance of HttpContext class which represents the current HTTP context.
+         * @returns {MailerHelper}
+         *
+         * @example
+         *
+         var mm = require("most-web-mailer");
+         mm.mailer(context)
+         .to("user@example.com")
+         .subject("Hello Message")
+         .body("Hello User.").send(function(err, res) {
+        return done(err);
+    });
+         */
+        getMailer: function(context) {
             return new MailerHelper(context);
         }
     };
