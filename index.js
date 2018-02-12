@@ -8,14 +8,11 @@
  * Released under the BSD3-Clause license
  * Date: 2015-09-24
  */
-/**
- * @ignore
- */
-var util = require('util'),
-    path = require('path'),
-    nodemailer = require('nodemailer'),
-    async = require('async'),
-    fs = require('fs');
+var util = require('util');
+var path = require('path');
+var nodemailer = require('nodemailer');
+var async = require('async');
+var fs = require('fs');
 
 if (typeof Array.prototype.distinct === 'undefined')
 {
@@ -220,6 +217,7 @@ MailerHelper.prototype.subject = function(subject) {
 /**
  * Sets the mail sender.
  * @param {string} sender - A string that represents the email address of the sender.
+ * @returns {MailerHelper}
  */
 MailerHelper.prototype.from = function(sender) {
     if (typeof sender === 'string') {
@@ -469,7 +467,7 @@ MailerHelper.prototype.send = function(data, callback) {
         }
         //initialize view engine
         else if (typeof self.template === 'string') {
-            var engines = context.application.config.engines;
+            var engines = context.application.getConfiguration().engines;
             async.eachSeries(engines,function(item, cb) {
                 try {
                     var templatePath = context.application.mapPath(util.format('/templates/mails/%s/html.%s' , self.template, item.extension));
@@ -533,13 +531,13 @@ function getDefaultTransporter(context) {
     var application = context.application;
     if (typeof application === 'undefined')
         return;
-    if (typeof application.config.settings === 'undefined')
+    if (typeof application.getConfiguration().settings === 'undefined')
         return;
     /**
      * @type {{service:string}|*}
      */
-    var options = application.config.settings['mail'] || application.config.settings['mailSettings'];
-    if (typeof options === 'undefined' || options == 'null')
+    var options = application.getConfiguration().settings['mail'] || application.getConfiguration().settings['mailSettings'];
+    if (typeof options === 'undefined' || options === null)
         return;
     return nodemailer.createTransport(options);
 }
@@ -557,13 +555,13 @@ function tryDefaultSender() {
     var application = self.context.application;
     if (typeof application === 'undefined')
         return;
-    if (typeof application.config.settings === 'undefined')
+    if (typeof application.getConfiguration().settings === 'undefined')
         return;
     /**
      * @type {{service:string,from:string}|*}
      */
-    var opts = application.config.settings['mail'] || application.config.settings['mailSettings'];
-    if (typeof opts === 'undefined' || opts == 'null')
+    var opts = application.getConfiguration().settings['mail'] || application.getConfiguration().settings['mailSettings'];
+    if (typeof opts === 'undefined' || opts === null)
         return;
     if (util.isArray(opts.from))
         self.options.from = opts.from.join(';');
@@ -584,13 +582,13 @@ function tryDefaultBCC() {
     var application = self.context.application;
     if (typeof application === 'undefined')
         return;
-    if (typeof application.config.settings === 'undefined')
+    if (typeof application.getConfiguration().settings === 'undefined')
         return;
     /**
      * @type {{service:string,bcc:string}|*}
      */
-    var opts = application.config.settings['mail'] || application.config.settings['mailSettings'];
-    if (typeof opts === 'undefined' || opts == 'null')
+    var opts = application.getConfiguration().settings['mail'] || application.getConfiguration().settings['mailSettings'];
+    if (typeof opts === 'undefined' || opts === null)
         return;
     if (util.isArray(opts.bcc))
         self.options.bcc = opts.bcc.join(';');
@@ -598,9 +596,6 @@ function tryDefaultBCC() {
         self.options.bcc = opts.bcc;
 }
 if (typeof exports !== 'undefined') {
-    /**
-     * @module most-web-mailer
-     */
     module.exports = {
         /**
          * Creates a new instance of MailHelper class.

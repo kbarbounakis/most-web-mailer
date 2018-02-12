@@ -1,8 +1,12 @@
-# most-web-mailer
+# @themost/mailer
 
 Most Web Framework Mailer simplifies mail operations inside in a MOST web application.
 
 Install with npm
+
+    npm install @themost/mailer
+    
+Note: If you want to install the previous version (0.1.x) of most-web-mailer module use:
 
     npm install most-web-mailer
 
@@ -30,6 +34,7 @@ You can use default mail transporter as it is defined in application configurati
     "settings": {
       ...
       "mail": {
+          "from": "user@example.com"
           "port":587,
           "host":"smtp.example.com",
           "auth": {
@@ -59,19 +64,18 @@ Create a file named html.ejs (Note: EJS is the default view engine for every MOS
             <div class="page-header">
                 <h1>MOST Web Framework Team</h1>
             </div>
-            <p>Hello <%=data.name%></p>
+            <p>Hello <%=model.name%></p>
         </body>
     </html>
 
 Finally send dynamic mail template:
 
-    var mm = require('most-web-mailer'), 
-    web = require('most-web');
+    import mailer from '@themost/mailer';
     //init mail in the current HTTP context
-    mm.mailer(context).from('user@example.com')
+    mailer.getMailer(context).from('user@example.com')
         .to('friend@example.com')
         .subject('Hello from user')
-        .template('my-first-template').send({ name: 'George' }, function(err) {
+        .template('my-first-template').send({ name: 'George' }, (err)=> {
             done(err);
         });
     
