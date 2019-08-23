@@ -1,6 +1,6 @@
 {
   "name": "@themost/mailer",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Most Web Framework Mailer Module",
   "homepage": "https://www.themost.io/",
   "repository": {
@@ -28,11 +28,37 @@
     "nodemailer": "^2.3.0"
   },
   "devDependencies": {
-    "@types/async": "^2.0.47"
+    "@types/async": "^2.0.47",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0"
   },
   "main": "index.js",
   "scripts": {},
   "bugs": {
     "url": "https://github.com/kbarbounakis/most-web-mailer/issues"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "node": true,
+      "es6": false,
+      "jquery": true
+    },
+    "globals": {
+      "describe": false,
+      "it": false
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+      "no-console": "warn",
+      "no-invalid-this": "warn",
+      "no-undef": "error",
+      "no-unused-vars": "warn",
+      "no-var": "off",
+      "strict": [
+        2,
+        "never"
+      ]
+    }
   }
 }

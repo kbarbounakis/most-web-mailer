@@ -433,7 +433,7 @@ MailerHelper.prototype.send = function(data, callback) {
                 //get default transporter
                 transporter = getDefaultTransporter(context);
                 if (typeof transporter === 'undefined' || transporter==null) {
-                    er = new Error('An error occured while initializing mail transporter.'); er.code = 'ESEND';
+                    er = new Error('An error occurred while initializing mail transporter.'); er.code = 'ESEND';
                     callback(er);
                 }
             }
@@ -467,10 +467,10 @@ MailerHelper.prototype.send = function(data, callback) {
         }
         //initialize view engine
         else if (typeof self.template === 'string') {
-            var engines = context.application.getConfiguration().engines;
+            var engines = context.application.getConfiguration().getSourceAt('engines');
             async.eachSeries(engines,function(item, cb) {
                 try {
-                    var templatePath = context.application.mapPath(util.format('/templates/mails/%s/html.%s' , self.template, item.extension));
+                    var templatePath = self.getTemplatePath(self.template, item.extension);
                     fs.stat(templatePath, function(err, result) {
                         if (err) {
                             //file does not exist, so exit without error
@@ -517,6 +517,14 @@ MailerHelper.prototype.send = function(data, callback) {
         callback(e);
     }
 };
+
+MailerHelper.prototype.getTemplatePath = function(template, extension) {
+    if (typeof this.context.application.mapPath === 'function') {
+        return this.context.application.mapPath(util.format('/templates/mails/%s/html.%s' , template, extension));
+    }
+    return path.resolve(this.context.application.getConfiguration().getExecutionPath(), util.format('templates/mails/%s/html.%s' , template, extension));
+};
+
 /**
  * Get MOST Web application default mail transporter as is is defined in settings#mail section
  * @param {HttpContext} context
