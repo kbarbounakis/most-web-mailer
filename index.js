@@ -426,15 +426,16 @@ MailerHelper.prototype.bcc = function(bcc) {
  */
 MailerHelper.prototype.send = function(data, callback) {
     callback = callback || function() {};
-    var transporter, er, self = this, context = self.context;
+    var transporter, error, self = this, context = self.context;
     try {
         if (!self._test) {
             if (typeof self._transporter === 'undefined' || self._transporter==null) {
                 //get default transporter
                 transporter = getDefaultTransporter(context);
                 if (typeof transporter === 'undefined' || transporter==null) {
-                    er = new Error('An error occurred while initializing mail transporter.'); er.code = 'ESEND';
-                    callback(er);
+                    error = new Error('An error occurred while initializing mail transporter.');
+                    error.code = 'ERR_MAIL_SEND';
+                    return callback(error);
                 }
             }
             else {
@@ -446,23 +447,16 @@ MailerHelper.prototype.send = function(data, callback) {
         //try to get default bcc recipients
         tryDefaultSender.call(self);
 
-        //if (typeof self.options.to === 'undefined' || self.options.to == null) {
-        //    er = new Error('Invalid mail recipients. Recipients list cannot be empty.'); er.code = 'EARG';
-        //    return callback(er);
-        //}
-        //if (self.options.to.length==0) {
-        //    er = new Error('Invalid mail recipients. Expected array.'); er.code = 'EARG';
-        //    return callback(new Error('Invalid mail recipients. Recipients list cannot be empty.'));
-        //}
-
         //create mail object
         var mail = self.options;
         if (typeof self.options.html === 'string' || typeof self.options.text === 'string') {
             //finally send email
             if (self._test) { return callback(null, mail); }
-            transporter.sendMail(mail, function (err, info) {
-                if (err) { callback(err); }
-                callback(null, info.response)
+            return transporter.sendMail(mail, function (err, info) {
+                if (err) {
+                    return callback(err);
+                }
+                return callback(null, info.response);
             });
         }
         //initialize view engine
@@ -507,8 +501,9 @@ MailerHelper.prototype.send = function(data, callback) {
                     callback(null, err);
                 }
                 else {
-                    er = new Error('Mail template cannot be found or refers to a template engine which is not implemented by this application.');er.code = 'ETMPL';
-                    callback(er)
+                    error = new Error('Mail template cannot be found or refers to a template engine which is not implemented by this application.');
+                    error.code = 'ERR_MAIL_TEMPLATE';
+                    callback(error)
                 }
             });
         }
