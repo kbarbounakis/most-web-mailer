@@ -600,6 +600,7 @@ function tryDefaultBCC() {
 }
 if (typeof exports !== 'undefined') {
     module.exports = {
+        MailHelper: MailerHelper,
         /**
          * Creates a new instance of MailHelper class.
          * @deprecated Use mailer.getMailer() instead
