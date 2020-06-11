@@ -1,20 +1,16 @@
 # @themost/mailer
 
-Most Web Framework Mailer simplifies mail operations inside in a MOST web application.
+[Most Web Framework](https://github.com/themost-framework/themost) Mailer simplifies mail operations by sending either static or dynamic html emails.
 
 Install with npm
 
     npm install @themost/mailer
     
-Note: If you want to install the previous version (0.1.x) of most-web-mailer module use:
 
-    npm install most-web-mailer
+Use `@themost/mailer` to send static html emails:
 
-Use most-web-mailer to send an html static email:
-
-    var mm = require('most-web-mailer'), 
-    web = require('most-web');
-    //init mail in the current HTTP context
+    var mm = require('@themost/mailer');
+    // init mail in the current HTTP context
     mm.mailer(context).transporter({
         service:'gmail',
         auth:{
@@ -28,7 +24,7 @@ Use most-web-mailer to send an html static email:
             done(err);
         });
     
-You can use default mail transporter as it is defined in application configuration section settings#mail. In this case you can omit transporter initialization. Here is the section as may be defined in application configuration:
+You can use default mail transporter as it is defined in application configuration section settings#mail. In this case you can omit transporter initialization. e.g.
 
     ...
     "settings": {
@@ -68,14 +64,14 @@ Create a file named html.ejs (Note: EJS is the default view engine for every MOS
         </body>
     </html>
 
-Finally send dynamic mail template:
+Finally, send dynamic mail template:
 
     import mailer from '@themost/mailer';
-    //init mail in the current HTTP context
+    // init mail in the current HTTP context
     mailer.getMailer(context).from('user@example.com')
         .to('friend@example.com')
         .subject('Hello from user')
-        .template('my-first-template').send({ name: 'George' }, (err)=> {
+        .template('my-first-template').send({ name: 'George' }, (err) => {
             done(err);
         });
     
