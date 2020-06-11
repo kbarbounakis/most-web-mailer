@@ -237,7 +237,7 @@ MailerHelper.prototype.from = function(sender) {
  */
 MailerHelper.prototype.replyTo = function(reply) {
     if (typeof reply === 'string') {
-        this.options.reply = reply;
+        this.options.replyTo = reply;
     }
     else {
         var er = new Error('Invalid argument. Expected string or array.'); er.code = 'EARG';
