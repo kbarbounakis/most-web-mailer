@@ -1,0 +1,24 @@
+{
+    "env": {
+        "browser": false,
+        "node": true,
+        "es6": false,
+        "jquery": false
+    },
+    "globals": {
+        "describe": false,
+        "it": false
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+        "no-console": "warn",
+        "no-invalid-this": "warn",
+        "no-undef": "error",
+        "no-unused-vars": "warn",
+        "no-var": "off",
+        "strict": [
+            2,
+            "never"
+        ]
+    }
+}

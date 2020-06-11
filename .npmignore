@@ -1,2 +1,10 @@
-node_modules
+# Project
+out/
+test/
+.eslintrc
+
+# IDE
 .idea
+.theia
+.vscode
+.DS_Store
