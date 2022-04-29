@@ -24,7 +24,7 @@
     }
   ],
   "dependencies": {
-    "async": "^1.4.2",
+    "async": "^2.6.4",
     "nodemailer": "^2.3.0"
   },
   "devDependencies": {
