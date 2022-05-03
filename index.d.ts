@@ -9,19 +9,21 @@
 
 export declare interface MailerHelper {
     context: any;
-    body(body: string): MailerHelper;
-    text(text: string): MailerHelper;
-    subject(subject: string): MailerHelper;
-    from(sender: string): MailerHelper;
-    replyTo(reply: string): MailerHelper;
-    attachments(...attachment:string[]): MailerHelper;
-    to(recipient: string): MailerHelper;
-    transporter(opts: any): MailerHelper;
-    test(value?: boolean): MailerHelper;
-    cc(...cc: string[]): MailerHelper;
-    bcc(...bcc: string[]): MailerHelper;
-    template(template: string): MailerHelper;
-    send(data: any, callback: (err?: Error, res?: any) => void);
+    constructor(context: any);
+    body(body: string): this;
+    text(text: string): this;
+    subject(subject: string): this;
+    from(sender: string): this;
+    replyTo(reply: string): this;
+    attachments(...attachment:string[]): this;
+    to(recipient: string): this;
+    transporter(opts: any): this;
+    test(value?: boolean): this;
+    cc(...cc: string[]): this;
+    bcc(...bcc: string[]): this;
+    template(template: string): this;
+    send(data: any, callback: (err?: Error, res?: any) => void): void;
+    sendAsync(data: any): Promise<void>;
 
 }
 

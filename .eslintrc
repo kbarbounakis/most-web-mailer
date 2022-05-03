@@ -2,12 +2,14 @@
     "env": {
         "browser": false,
         "node": true,
-        "es6": false,
+        "es6": true,
         "jquery": false
     },
     "globals": {
+        "jasmine": false,
         "describe": false,
-        "it": false
+        "it": false,
+        "expect": false
     },
     "extends": "eslint:recommended",
     "rules": {

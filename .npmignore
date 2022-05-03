@@ -8,3 +8,6 @@ test/
 .theia
 .vscode
 .DS_Store
+
+# test
+spec
