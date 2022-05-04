@@ -1,15 +1,26 @@
 {
+    "extends": [
+        "eslint:recommended",
+        "plugin:node/recommended"
+    ],
     "env": {
         "browser": false,
         "node": true,
-        "es6": false,
+        "es6": true,
         "jquery": false
     },
-    "globals": {
-        "describe": false,
-        "it": false
+    "parserOptions": {
+        "ecmaVersion": 2020
     },
-    "extends": "eslint:recommended",
+    "globals": {
+        "jasmine": false,
+        "describe": false,
+        "it": false,
+        "expect": false,
+        "expectAsync": false,
+        "beforeAll": false,
+        "afterAll": false
+    },
     "rules": {
         "no-console": "warn",
         "no-invalid-this": "warn",

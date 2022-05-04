@@ -1,13 +1,5 @@
-/**
- * MOST Web Framework
- * A JavaScript Web Framework
- * http://themost.io
- *
- * Copyright (c) 2014, Kyriakos Barbounakis k.barbounakis@gmail.com, Anthi Oikonomou anthioikonomou@gmail.com
- *
- * Released under the BSD3-Clause license
- * Date: 2015-09-24
- */
+// MOST Web Framework Codename Zero Gravity Copyright (c) 2017-2022, THEMOST LP All rights reserved
+
 var util = require('util');
 var path = require('path');
 var nodemailer = require('nodemailer');
@@ -50,7 +42,9 @@ if (typeof Array.prototype.distinct === 'undefined')
             Object.defineProperty(Array.prototype, 'distinct', {
                 value: distinct, configurable: true, enumerable: false, writable: true
             });
-        } catch(e) {}
+        } catch(e) {
+            //
+        }
     }
     if (!Array.prototype.distinct) { Array.prototype.distinct = distinct; }
 }
@@ -59,12 +53,13 @@ if (typeof Array.prototype.distinct === 'undefined')
  * @ignore
  * @private
  */
+// eslint-disable-next-line no-unused-vars
 function argumentsArray(p) {
     var arr = [], args = [];
     args.push.apply(args, arguments);
     args.forEach(function(x) {
         //backward compatibility test
-        if (util.isArray(x)) {
+        if (Array.isArray(x)) {
             arr.push.apply(arr, x);
         }
         else if (typeof x === 'string') {
@@ -149,8 +144,8 @@ MailerHelper.prototype.template = function(template) {
  *
  * @example
  *
- var mm = require("most-web-mailer");
- mm.mailer(context).subject("Good morning")
+const {MailHelper} = require("@themost/mailer");
+new MailHelper(context).subject("Good morning")
  .body("<p style='color:lightblue'>This is an HTML message</p>")
  .to("user@example.com")
  .send(function(err, res) {
@@ -177,8 +172,8 @@ MailerHelper.prototype.body = function(body) {
  *
  * @example
  *
- var mm = require("most-web-mailer");
- mm.mailer(context).subject("Good morning")
+const {MailHelper} = require("@themost/mailer");
+ new MailHelper(context).subject("Good morning")
  .text("This is a plain text message.")
  .to("user@example.com")
  .send(function(err, res) {
@@ -252,14 +247,15 @@ MailerHelper.prototype.replyTo = function(reply) {
  * @returns {MailerHelper}
  *
  * @example
-var mm = require("most-web-mailer");
-mm.mailer(context).attachments("/tmp/cv.doc","/tmp/photo.jpeg")
+const {MailHelper} = require("@themost/mailer");
+new MailHelper(context).attachments("/tmp/cv.doc","/tmp/photo.jpeg")
  .subject("New CV")
  .body("I am sending you my new CV. Best Regards.")
  .send(function(err, res) {
     return done(err);
 });
  */
+// eslint-disable-next-line no-unused-vars
 MailerHelper.prototype.attachments = function(p) {
     var self = this;
     var arr = argumentsArray.apply(this, arguments);
@@ -285,14 +281,15 @@ MailerHelper.prototype.attachments = function(p) {
  *
  * @example
  *
- var mm = require("most-web-mailer");
- mm.mailer(context).subject("Good morning")
+const {MailHelper} = require("@themost/mailer");
+new MailHelper(context).subject("Good morning")
  .text("Have a nice day!")
  .to("user@example.com", "other@example.com")
  .send(function(err, res) {
     return done(err);
 });
  */
+// eslint-disable-next-line no-unused-vars
 MailerHelper.prototype.to = function(recipient) {
     var p1 = argumentsArray.apply(this, arguments).join(';');
     if (p1.length>0)
@@ -340,8 +337,8 @@ MailerHelper.prototype.transporter = function(opts) {
  * @returns {MailerHelper}
  *
  * @example
- var mm = require("most-web-mailer");
- mm.mailer(context).subject("Good morning")
+const {MailHelper} = require('@themost/mailer');
+ new MailHelper(context).subject("Good morning")
  .subject("New Order")
  .template("new-order-notification")
  .to("employee1@example.com")
@@ -359,12 +356,12 @@ MailerHelper.prototype.test = function(value) {
 
 /**
  * Sets the message secondary recipient(s).
- * @param {string} cc - A string that represents the email address of a message recipient.
+ * @param {...string} cc - A string that represents the email address of a message recipient.
  * @returns {MailerHelper}
  *
  * @example
- var mm = require("most-web-mailer");
- mm.mailer(context).subject("Good morning")
+const {MailHelper} = require('@themost/mailer');
+ new MailHelper(context).subject("Good morning")
  .subject("New Order")
  .template("new-order-notification")
  .to("employee1@example.com")
@@ -373,6 +370,7 @@ MailerHelper.prototype.test = function(value) {
     return done(err);
 });
  */
+// eslint-disable-next-line no-unused-vars
 MailerHelper.prototype.cc = function(cc) {
     var p1 = argumentsArray.apply(this, arguments).join(';');
     if (p1.length>0)
@@ -389,8 +387,8 @@ MailerHelper.prototype.cc = function(cc) {
  *
  * @example
  *
- var mm = require("most-web-mailer");
- mm.mailer(context).subject("Good morning")
+ const {MailHelper} = require("@themost/mailer");
+ new MailHelper(context).subject("Good morning")
  .text("This is a plain text message.")
  .to("user@example.com")
  .bcc("admin1@example.com","admin2@example.com")
@@ -398,6 +396,7 @@ MailerHelper.prototype.cc = function(cc) {
     return done(err);
 });
  */
+// eslint-disable-next-line no-unused-vars
 MailerHelper.prototype.bcc = function(bcc) {
     var p1 = argumentsArray.apply(this, arguments).join(';');
     if (p1.length>0)
@@ -415,8 +414,8 @@ MailerHelper.prototype.bcc = function(bcc) {
  *
  * @example
  *
- var mm = require("most-web-mailer");
- mm.mailer(context).subject("Good morning")
+const {MailHelper} = require('@themost/mailer');
+ new MailHelper(context).subject("Good morning")
  .text("This is a plain text message.")
  .to("user2@example.com")
  .cc("friend1@example.com","friend2@example.com")
@@ -512,6 +511,21 @@ MailerHelper.prototype.send = function(data, callback) {
         callback(e);
     }
 };
+/**
+ * Sends a mail message
+ * @param {*} data 
+ */
+MailerHelper.prototype.sendAsync = function(data) {
+    var self = this;
+    return new Promise(function(resolve, reject) {
+        return self.send(data, function(err, result) {
+            if (err) {
+                return reject(err);
+            }
+            return resolve(result);
+        });
+    });
+}
 
 MailerHelper.prototype.getTemplatePath = function(template, extension) {
     if (typeof this.context.application.mapPath === 'function') {
@@ -566,7 +580,7 @@ function tryDefaultSender() {
     var opts = application.getConfiguration().settings['mail'] || application.getConfiguration().settings['mailSettings'];
     if (typeof opts === 'undefined' || opts === null)
         return;
-    if (util.isArray(opts.from))
+    if (Array.isArray(opts.from))
         self.options.from = opts.from.join(';');
     else if (typeof opts.from === 'string')
         self.options.from = opts.from;
@@ -593,12 +607,11 @@ function tryDefaultBCC() {
     var opts = application.getConfiguration().settings['mail'] || application.getConfiguration().settings['mailSettings'];
     if (typeof opts === 'undefined' || opts === null)
         return;
-    if (util.isArray(opts.bcc))
+    if (Array.isArray(opts.bcc))
         self.options.bcc = opts.bcc.join(';');
     else if (typeof opts.bcc === 'string')
         self.options.bcc = opts.bcc;
 }
-if (typeof exports !== 'undefined') {
     module.exports = {
         MailHelper: MailerHelper,
         /**
@@ -609,8 +622,8 @@ if (typeof exports !== 'undefined') {
          *
          * @example
          *
-var mm = require("most-web-mailer");
-mm.mailer(context)
+const {MailHelper} = require("@themost/mailer");
+new MailHelper(context)
     .to("user@example.com")
     .subject("Hello Message")
     .body("Hello User.").send(function(err, res) {
@@ -627,8 +640,8 @@ mm.mailer(context)
          *
          * @example
          *
-         var mm = require("most-web-mailer");
-         mm.mailer(context)
+        const {MailHelper} = require('@themost/mailer');
+         new MailHelper(context)
          .to("user@example.com")
          .subject("Hello Message")
          .body("Hello User.").send(function(err, res) {
@@ -639,5 +652,4 @@ mm.mailer(context)
             return new MailerHelper(context);
         }
     };
-}
 

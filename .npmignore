@@ -8,3 +8,12 @@ test/
 .theia
 .vscode
 .DS_Store
+
+# test
+spec
+.nycrc
+coverage
+.nyc_output
+
+# github
+.github

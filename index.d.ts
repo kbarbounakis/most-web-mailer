@@ -1,27 +1,38 @@
-/**
- * @license
- * MOST Web Framework 2.0 Codename Blueshift
- * Copyright (c) 2017, THEMOST LP All rights reserved
- *
- * Use of this source code is governed by an BSD-3-Clause license that can be
- * found in the LICENSE file at https://themost.io/license
- */
+// MOST Web Framework Codename Zero Gravity Copyright (c) 2017-2022, THEMOST LP All rights reserved
 
-export declare interface MailerHelper {
-    context: any;
-    body(body: string): MailerHelper;
-    text(text: string): MailerHelper;
-    subject(subject: string): MailerHelper;
-    from(sender: string): MailerHelper;
-    replyTo(reply: string): MailerHelper;
-    attachments(...attachment:string[]): MailerHelper;
-    to(recipient: string): MailerHelper;
-    transporter(opts: any): MailerHelper;
-    test(value?: boolean): MailerHelper;
-    cc(...cc: string[]): MailerHelper;
-    bcc(...bcc: string[]): MailerHelper;
-    template(template: string): MailerHelper;
-    send(data: any, callback: (err?: Error, res?: any) => void);
+import { ConfigurationBase } from "@themost/common";
+
+export interface MailHelperApplication {
+    getConfiguration(): ConfigurationBase
+}
+
+export interface MailHelperTemplateEngine {
+    render(templatePath: string, data: any, callback: (err?: Error, res?: any) => void): void;
+}
+
+export interface MailHelperContext {
+    application: MailHelperApplication;
+    engine(extension: string): MailHelperTemplateEngine
+}
+
+
+export declare class MailerHelper {
+    context: MailHelperContext | any;
+    constructor(context: MailHelperContext | any);
+    body(body: string): this;
+    text(text: string): this;
+    subject(subject: string): this;
+    from(sender: string): this;
+    replyTo(reply: string): this;
+    attachments(...attachment:string[]): this;
+    to(recipient: string): this;
+    transporter(opts: any): this;
+    test(value?: boolean): this;
+    cc(...cc: string[]): this;
+    bcc(...bcc: string[]): this;
+    template(template: string): this;
+    send(data: any, callback: (err?: Error, res?: any) => void): void;
+    sendAsync(data: any): Promise<any>;
 
 }
 

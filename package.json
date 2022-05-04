@@ -1,6 +1,6 @@
 {
   "name": "@themost/mailer",
-  "version": "2.1.5",
+  "version": "2.5.1",
   "description": "Most Web Framework Mailer Module",
   "homepage": "https://www.themost.io/",
   "repository": {
@@ -23,17 +23,28 @@
       "type": "BSD-3-Clause"
     }
   ],
+  "peerDependencies": {
+    "@themost/common": ">=2.5.6 <3.0.0"
+  },
   "dependencies": {
-    "async": "^1.4.2",
-    "nodemailer": "^2.3.0"
+    "async": "^2.6.4",
+    "nodemailer": "^6.7.4"
   },
   "devDependencies": {
     "@types/async": "^2.0.47",
-    "eslint": "^7.32.0"
+    "dotenv": "^16.0.0",
+    "ejs": "^3.1.7",
+    "eslint": "^8.14.0",
+    "eslint-plugin-node": "^11.1.0",
+    "jasmine": "^4.1.0",
+    "jasmine-spec-reporter": "^7.0.0",
+    "nyc": "^15.1.0"
   },
   "main": "index.js",
   "types": "index.d.ts",
-  "scripts": {},
+  "scripts": {
+    "test": "nyc jasmine"
+  },
   "bugs": {
     "url": "https://github.com/kbarbounakis/most-web-mailer/issues"
   }

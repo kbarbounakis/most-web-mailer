@@ -9,9 +9,9 @@ Install with npm
 
 Use `@themost/mailer` to send static html emails:
 
-    var mm = require('@themost/mailer');
+    import {MailHelper} from '@themost/mailer';
     // init mail in the current HTTP context
-    mm.mailer(context).transporter({
+    new MailHelper(context).transporter({
         service:'gmail',
         auth:{
             user:"user@example.com",
@@ -66,9 +66,9 @@ Create a file named html.ejs (Note: EJS is the default view engine for every MOS
 
 Finally, send dynamic mail template:
 
-    import mailer from '@themost/mailer';
+    import {MailHelper} from '@themost/mailer';
     // init mail in the current HTTP context
-    mailer.getMailer(context).from('user@example.com')
+    new MailHelper(context).from('user@example.com')
         .to('friend@example.com')
         .subject('Hello from user')
         .template('my-first-template').send({ name: 'George' }, (err) => {
