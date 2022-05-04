@@ -1,13 +1,13 @@
 const {MailHelper} = require('../index');
 const { TestApplication } = require('./TestApplication');
-
+const path = require('path');
 
 describe('MailHelper', () => {
 
     let app;
     beforeAll(() => {
-        app = new TestApplication();
-    })
+        app = new TestApplication(path.resolve(__dirname, 'test-app'));
+    });
 
     it('should create instance', () => {
         const mailer = new MailHelper();
@@ -33,7 +33,25 @@ describe('MailHelper', () => {
             mailer.subject('New Mail Message')
                 .body(`<h1>Hello World</h1>`)
                 .to('user1@example.com')
-                .cc('user2@example.com').sendAsync()
+                .cc('user2@example.com', 'user3@example.com')
+                .bcc('admin1@example.com')
+                .replyTo('services1@example.com')
+                .sendAsync()
+        ).toBeResolved();
+    });
+
+    it('should send mail template', async () => {
+        const context = app.createContext();
+        /**
+         * @type {MailHelper}
+         */
+        const mailer = new MailHelper(context);
+        await expectAsync(
+            mailer.subject('New mail message from template')
+                .template('test-message')
+                .to('user1@example.com')
+                .replyTo('services1@example.com')
+                .sendAsync()
         ).toBeResolved();
     });
 

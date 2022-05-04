@@ -12,3 +12,5 @@ test/
 # test
 spec
 .nycrc
+coverage
+.nyc_output

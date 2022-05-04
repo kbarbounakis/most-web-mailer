@@ -1,8 +1,24 @@
 // MOST Web Framework Codename Zero Gravity Copyright (c) 2017-2022, THEMOST LP All rights reserved
 
+import { ConfigurationBase } from "@themost/common";
+
+export interface MailHelperApplication {
+    getConfiguration(): ConfigurationBase
+}
+
+export interface MailHelperTemplateEngine {
+    render(templatePath: string, data: any, callback: (err?: Error, res?: any) => void): void;
+}
+
+export interface MailHelperContext {
+    application: MailHelperApplication;
+    engine(extension: string): MailHelperTemplateEngine
+}
+
+
 export declare class MailerHelper {
-    context: any;
-    constructor(context: any);
+    context: MailHelperContext | any;
+    constructor(context: MailHelperContext | any);
     body(body: string): this;
     text(text: string): this;
     subject(subject: string): this;
