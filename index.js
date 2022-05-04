@@ -1,13 +1,5 @@
-/**
- * MOST Web Framework
- * A JavaScript Web Framework
- * http://themost.io
- *
- * Copyright (c) 2014, Kyriakos Barbounakis k.barbounakis@gmail.com, Anthi Oikonomou anthioikonomou@gmail.com
- *
- * Released under the BSD3-Clause license
- * Date: 2015-09-24
- */
+// MOST Web Framework Codename Zero Gravity Copyright (c) 2017-2022, THEMOST LP All rights reserved
+
 var util = require('util');
 var path = require('path');
 var nodemailer = require('nodemailer');
@@ -67,7 +59,7 @@ function argumentsArray(p) {
     args.push.apply(args, arguments);
     args.forEach(function(x) {
         //backward compatibility test
-        if (util.isArray(x)) {
+        if (Array.isArray(x)) {
             arr.push.apply(arr, x);
         }
         else if (typeof x === 'string') {
@@ -345,8 +337,8 @@ MailerHelper.prototype.transporter = function(opts) {
  * @returns {MailerHelper}
  *
  * @example
- var mm = require("@themost/mailer");
- mm.mailer(context).subject("Good morning")
+const {MailHelper} = require('@themost/mailer');
+ new MailHelper(context).subject("Good morning")
  .subject("New Order")
  .template("new-order-notification")
  .to("employee1@example.com")
@@ -368,8 +360,8 @@ MailerHelper.prototype.test = function(value) {
  * @returns {MailerHelper}
  *
  * @example
- var mm = require("@themost/mailer");
- mm.mailer(context).subject("Good morning")
+const {MailHelper} = require('@themost/mailer');
+ new MailHelper(context).subject("Good morning")
  .subject("New Order")
  .template("new-order-notification")
  .to("employee1@example.com")
@@ -422,8 +414,8 @@ MailerHelper.prototype.bcc = function(bcc) {
  *
  * @example
  *
- var mm = require("@themost/mailer");
- mm.mailer(context).subject("Good morning")
+const {MailHelper} = require('@themost/mailer');
+ new MailHelper(context).subject("Good morning")
  .text("This is a plain text message.")
  .to("user2@example.com")
  .cc("friend1@example.com","friend2@example.com")
@@ -519,6 +511,21 @@ MailerHelper.prototype.send = function(data, callback) {
         callback(e);
     }
 };
+/**
+ * Sends a mail message
+ * @param {*} data 
+ */
+MailerHelper.prototype.sendAsync = function(data) {
+    var self = this;
+    return new Promise(function(resolve, reject) {
+        return self.send(data, function(err, result) {
+            if (err) {
+                return reject(err);
+            }
+            return resolve(result);
+        });
+    });
+}
 
 MailerHelper.prototype.getTemplatePath = function(template, extension) {
     if (typeof this.context.application.mapPath === 'function') {
@@ -573,7 +580,7 @@ function tryDefaultSender() {
     var opts = application.getConfiguration().settings['mail'] || application.getConfiguration().settings['mailSettings'];
     if (typeof opts === 'undefined' || opts === null)
         return;
-    if (util.isArray(opts.from))
+    if (Array.isArray(opts.from))
         self.options.from = opts.from.join(';');
     else if (typeof opts.from === 'string')
         self.options.from = opts.from;
@@ -600,12 +607,11 @@ function tryDefaultBCC() {
     var opts = application.getConfiguration().settings['mail'] || application.getConfiguration().settings['mailSettings'];
     if (typeof opts === 'undefined' || opts === null)
         return;
-    if (util.isArray(opts.bcc))
+    if (Array.isArray(opts.bcc))
         self.options.bcc = opts.bcc.join(';');
     else if (typeof opts.bcc === 'string')
         self.options.bcc = opts.bcc;
 }
-if (typeof exports !== 'undefined') {
     module.exports = {
         MailHelper: MailerHelper,
         /**
@@ -616,8 +622,8 @@ if (typeof exports !== 'undefined') {
          *
          * @example
          *
-var mm = require("@themost/mailer");
-mm.mailer(context)
+const {MailHelper} = require("@themost/mailer");
+new MailHelper(context)
     .to("user@example.com")
     .subject("Hello Message")
     .body("Hello User.").send(function(err, res) {
@@ -634,8 +640,8 @@ mm.mailer(context)
          *
          * @example
          *
-         var mm = require("@themost/mailer");
-         mm.mailer(context)
+        const {MailHelper} = require('@themost/mailer');
+         new MailHelper(context)
          .to("user@example.com")
          .subject("Hello Message")
          .body("Hello User.").send(function(err, res) {
@@ -646,5 +652,4 @@ mm.mailer(context)
             return new MailerHelper(context);
         }
     };
-}
 
