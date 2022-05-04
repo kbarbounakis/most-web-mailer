@@ -7,6 +7,7 @@ const testConfiguration = {
     "secure": false,
     "ignoreTLS": true,
     "from": "Test Mail Services <mailer@example.com>",
+    "bcc": "support1@example.com"
 } 
 
 class TestContext {

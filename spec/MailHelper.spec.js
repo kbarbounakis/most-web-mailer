@@ -55,4 +55,16 @@ describe('MailHelper', () => {
         ).toBeResolved();
     });
 
+    it('should send to configured bcc', async () => {
+        const context = app.createContext();
+        context.application.getConfiguration().getSourceAt('settings/mail/bcc', 'support1@example.com');
+        /**
+         * @type {MailHelper}
+         */
+        const mailer = new MailHelper(context);
+        await expectAsync(
+            mailer.subject('New Text Message').text('Hello World!').to('user1@example.com').sendAsync()
+        ).toBeResolved();
+    });
+
 });
