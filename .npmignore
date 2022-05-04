@@ -14,3 +14,6 @@ spec
 .nycrc
 coverage
 .nyc_output
+
+# github
+.github
