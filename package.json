@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@types/async": "^2.0.47",
+    "@types/nodemailer": "^6.4.17",
     "dotenv": "^16.0.0",
     "ejs": "^3.1.7",
     "eslint": "^8.14.0",

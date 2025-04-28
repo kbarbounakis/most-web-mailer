@@ -1,6 +1,7 @@
 // MOST Web Framework Codename Zero Gravity Copyright (c) 2017-2022, THEMOST LP All rights reserved
 
 import { ConfigurationBase } from "@themost/common";
+import {Transport, Transporter} from "nodemailer";
 
 export interface MailHelperApplication {
     getConfiguration(): ConfigurationBase
@@ -33,6 +34,8 @@ export declare class MailerHelper {
     template(template: string): this;
     send(data: any, callback: (err?: Error, res?: any) => void): void;
     sendAsync(data: any): Promise<any>;
+    getTransporter(): Transport;
+    transporter(transport:Transport): this;
 
 }
 

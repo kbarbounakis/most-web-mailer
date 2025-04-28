@@ -144,13 +144,13 @@ MailerHelper.prototype.template = function(template) {
  *
  * @example
  *
-const {MailHelper} = require("@themost/mailer");
-new MailHelper(context).subject("Good morning")
+ const {MailHelper} = require("@themost/mailer");
+ new MailHelper(context).subject("Good morning")
  .body("<p style='color:lightblue'>This is an HTML message</p>")
  .to("user@example.com")
  .send(function(err, res) {
-    return done(err);
-});
+ return done(err);
+ });
  */
 MailerHelper.prototype.body = function(body) {
     if (typeof body === 'string') {
@@ -172,13 +172,13 @@ MailerHelper.prototype.body = function(body) {
  *
  * @example
  *
-const {MailHelper} = require("@themost/mailer");
+ const {MailHelper} = require("@themost/mailer");
  new MailHelper(context).subject("Good morning")
  .text("This is a plain text message.")
  .to("user@example.com")
  .send(function(err, res) {
-    return done(err);
-});
+ return done(err);
+ });
  */
 MailerHelper.prototype.text = function(text) {
     if (typeof text === 'string') {
@@ -247,13 +247,13 @@ MailerHelper.prototype.replyTo = function(reply) {
  * @returns {MailerHelper}
  *
  * @example
-const {MailHelper} = require("@themost/mailer");
-new MailHelper(context).attachments("/tmp/cv.doc","/tmp/photo.jpeg")
+ const {MailHelper} = require("@themost/mailer");
+ new MailHelper(context).attachments("/tmp/cv.doc","/tmp/photo.jpeg")
  .subject("New CV")
  .body("I am sending you my new CV. Best Regards.")
  .send(function(err, res) {
-    return done(err);
-});
+ return done(err);
+ });
  */
 // eslint-disable-next-line no-unused-vars
 MailerHelper.prototype.attachments = function(p) {
@@ -267,9 +267,9 @@ MailerHelper.prototype.attachments = function(p) {
         }
         //add file attachment as string
         self.options.attachments.push({
-                filename: path.basename(x),
-                content: fs.createReadStream(x)
-            });
+            filename: path.basename(x),
+            content: fs.createReadStream(x)
+        });
     });
     return this;
 };
@@ -281,13 +281,13 @@ MailerHelper.prototype.attachments = function(p) {
  *
  * @example
  *
-const {MailHelper} = require("@themost/mailer");
-new MailHelper(context).subject("Good morning")
+ const {MailHelper} = require("@themost/mailer");
+ new MailHelper(context).subject("Good morning")
  .text("Have a nice day!")
  .to("user@example.com", "other@example.com")
  .send(function(err, res) {
-    return done(err);
-});
+ return done(err);
+ });
  */
 // eslint-disable-next-line no-unused-vars
 MailerHelper.prototype.to = function(recipient) {
@@ -304,28 +304,28 @@ MailerHelper.prototype.to = function(recipient) {
  * The default message transporter is defined in application config#settings.mail.
  *<br>
  * e.g. {
-          "port":587,
-          "host":"smtp.example.com",
-          "auth": {
-            "user":"sender@example.com",
-            "pass":"password"
-          }
-        }
+ "port":587,
+ "host":"smtp.example.com",
+ "auth": {
+ "user":"sender@example.com",
+ "pass":"password"
+ }
+ }
  <br>
  or {
-    service: 'Gmail',
-    auth: {
-        user: 'gmail.user@gmail.com',
-        pass: 'userpass'
-    }
-} etc.
+ service: 'Gmail',
+ auth: {
+ user: 'gmail.user@gmail.com',
+ pass: 'userpass'
+ }
+ } etc.
  <br>
  * For further information about message transporters visit {@link https://github.com/andris9/Nodemailer|Nodemailer}
- * @param {{service:string,host:string,port:string,auth:{user:string,pass:string,xoauth2:string},secure:boolean,ignoreTLS:boolean}|*} opts
+ * @param {*} transporter
  * @returns {MailerHelper}
  */
-MailerHelper.prototype.transporter = function(opts) {
-    this._transporter = opts;
+MailerHelper.prototype.transporter = function(transporter) {
+    this._transporter = transporter;
     return this;
 };
 
@@ -337,17 +337,17 @@ MailerHelper.prototype.transporter = function(opts) {
  * @returns {MailerHelper}
  *
  * @example
-const {MailHelper} = require('@themost/mailer');
+ const {MailHelper} = require('@themost/mailer');
  new MailHelper(context).subject("Good morning")
  .subject("New Order")
  .template("new-order-notification")
  .to("employee1@example.com")
  .test()
  .send({ "id":1200, "product","17-inch LCD Monitor","customer":"Alexis Williams" }, function(err, res) {
-    if (err) { return done(err); }
-    console.log("Message Body: " + body;
-    return done();
-});
+ if (err) { return done(err); }
+ console.log("Message Body: " + body;
+ return done();
+ });
  */
 MailerHelper.prototype.test = function(value) {
     this._test = !!value;
@@ -360,15 +360,15 @@ MailerHelper.prototype.test = function(value) {
  * @returns {MailerHelper}
  *
  * @example
-const {MailHelper} = require('@themost/mailer');
+ const {MailHelper} = require('@themost/mailer');
  new MailHelper(context).subject("Good morning")
  .subject("New Order")
  .template("new-order-notification")
  .to("employee1@example.com")
  .cc("sales1@example.com", "sales2@example.com")
  .send({ "id":1200, "product","17-inch LCD Monitor","customer":"Alexis Williams" }, function(err, res) {
-    return done(err);
-});
+ return done(err);
+ });
  */
 // eslint-disable-next-line no-unused-vars
 MailerHelper.prototype.cc = function(cc) {
@@ -393,8 +393,8 @@ MailerHelper.prototype.cc = function(cc) {
  .to("user@example.com")
  .bcc("admin1@example.com","admin2@example.com")
  .send(function(err, res) {
-    return done(err);
-});
+ return done(err);
+ });
  */
 // eslint-disable-next-line no-unused-vars
 MailerHelper.prototype.bcc = function(bcc) {
@@ -414,14 +414,14 @@ MailerHelper.prototype.bcc = function(bcc) {
  *
  * @example
  *
-const {MailHelper} = require('@themost/mailer');
+ const {MailHelper} = require('@themost/mailer');
  new MailHelper(context).subject("Good morning")
  .text("This is a plain text message.")
  .to("user2@example.com")
  .cc("friend1@example.com","friend2@example.com")
  .send(function(err, res) {
-    return done(err);
-});
+ return done(err);
+ });
  */
 MailerHelper.prototype.send = function(data, callback) {
     callback = callback || function() {};
@@ -438,7 +438,7 @@ MailerHelper.prototype.send = function(data, callback) {
                 }
             }
             else {
-                transporter = nodemailer.createTransport(self._transporter);
+                transporter = self._transporter;
             }
         }
         //try to get default sender
@@ -511,9 +511,18 @@ MailerHelper.prototype.send = function(data, callback) {
         callback(e);
     }
 };
+
+MailerHelper.prototype.getTransporter = function() {
+    if (this._transporter) {
+        return this._transporter;
+    }
+    this._transporter = getDefaultTransporter(this.context);
+    return this._transporter;
+}
+
 /**
  * Sends a mail message
- * @param {*} data 
+ * @param {*} data
  */
 MailerHelper.prototype.sendAsync = function(data) {
     var self = this;
@@ -612,44 +621,44 @@ function tryDefaultBCC() {
     else if (typeof opts.bcc === 'string')
         self.options.bcc = opts.bcc;
 }
-    module.exports = {
-        MailHelper: MailerHelper,
-        /**
-         * Creates a new instance of MailHelper class.
-         * @deprecated Use mailer.getMailer() instead
-         * @param {HttpContext|*} context - An instance of HttpContext class which represents the current HTTP context.
-         * @returns {MailerHelper}
-         *
-         * @example
-         *
-const {MailHelper} = require("@themost/mailer");
-new MailHelper(context)
-    .to("user@example.com")
-    .subject("Hello Message")
-    .body("Hello User.").send(function(err, res) {
-        return done(err);
-    });
-         */
-        mailer: function(context) {
-            return new MailerHelper(context);
-        },
-        /**
-         * Creates a new instance of MailHelper class.
-         * @param {HttpContext|*} context - An instance of HttpContext class which represents the current HTTP context.
-         * @returns {MailerHelper}
-         *
-         * @example
-         *
-        const {MailHelper} = require('@themost/mailer');
-         new MailHelper(context)
-         .to("user@example.com")
-         .subject("Hello Message")
-         .body("Hello User.").send(function(err, res) {
-        return done(err);
-    });
-         */
-        getMailer: function(context) {
-            return new MailerHelper(context);
-        }
-    };
+module.exports = {
+    MailHelper: MailerHelper,
+    /**
+     * Creates a new instance of MailHelper class.
+     * @deprecated Use mailer.getMailer() instead
+     * @param {HttpContext|*} context - An instance of HttpContext class which represents the current HTTP context.
+     * @returns {MailerHelper}
+     *
+     * @example
+     *
+     const {MailHelper} = require("@themost/mailer");
+     new MailHelper(context)
+     .to("user@example.com")
+     .subject("Hello Message")
+     .body("Hello User.").send(function(err, res) {
+     return done(err);
+     });
+     */
+    mailer: function(context) {
+        return new MailerHelper(context);
+    },
+    /**
+     * Creates a new instance of MailHelper class.
+     * @param {HttpContext|*} context - An instance of HttpContext class which represents the current HTTP context.
+     * @returns {MailerHelper}
+     *
+     * @example
+     *
+     const {MailHelper} = require('@themost/mailer');
+     new MailHelper(context)
+     .to("user@example.com")
+     .subject("Hello Message")
+     .body("Hello User.").send(function(err, res) {
+     return done(err);
+     });
+     */
+    getMailer: function(context) {
+        return new MailerHelper(context);
+    }
+};
 
